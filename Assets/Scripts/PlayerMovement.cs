@@ -5,33 +5,70 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     public float moveSpeed;
- 
-    void Start()
-    {
-        
-    }
+    public float walkSpeed;
+    float realSpeed;
+    public float rotationspeed;
+    public float rotX;
+    public float rotY;
+    public float rotZ;
     void Update()
     {
-        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey("w"))
+        WalkAndRun();
+        HorizontalMovement();
+        VerticalMovement();
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            transform.position += transform.TransformDirection(Vector3.forward) * Time.deltaTime * moveSpeed; 
+            GetComponent<Rigidbody>().AddForce(Vector3.up * 500);
         }
-        else if (Input.GetKey("w") && Input.GetKey(KeyCode.LeftShift))
+        rotX -= Input.GetAxis("Mouse Y") * Time.deltaTime * rotationspeed;
+        rotY += Input.GetAxis("Mouse X") * Time.deltaTime * rotationspeed;
+
+        if(rotX < -90)
         {
-            transform.position += transform.TransformDirection(Vector3.forward) * Time.deltaTime * moveSpeed;
-        }
-        else if (Input.GetKey("s"))
+            rotX = -90;
+        } else if (rotX > 90)
         {
-            transform.position -= transform.TransformDirection(Vector3.forward) * Time.deltaTime * moveSpeed;
+            rotX = 90;
         }
 
-        if(Input.GetKey("a") && !Input.GetKey("d"))
+        transform.rotation = Quaternion.Euler(0, rotY, 0);
+        GameObject.FindWithTag("MainCamera").transform.rotation = Quaternion.Euler(rotX, rotY, 0);
+    }
+
+    private void WalkAndRun()
+    {
+        if (Input.GetKey(KeyCode.LeftShift))
         {
-            transform.position += transform.TransformDirection(Vector3.left) * Time.deltaTime * moveSpeed;
+            realSpeed = walkSpeed;
         }
-        else if (Input.GetKey("d") && !Input.GetKey("a"))
+        if (Input.GetKeyUp(KeyCode.LeftShift))
         {
-            transform.position -= transform.TransformDirection(Vector3.left) * Time.deltaTime * moveSpeed;
+            realSpeed = moveSpeed;
         }
     }
+
+    private void VerticalMovement()
+    {
+        if (Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D))
+        {
+            transform.position += transform.TransformDirection(Vector3.left) * Time.deltaTime * realSpeed;
+        }
+        else if (!Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D))
+        {
+            transform.position -= transform.TransformDirection(Vector3.left) * Time.deltaTime * realSpeed;
+        }
+    }
+
+    private void HorizontalMovement()
+    {
+        if (Input.GetKey(KeyCode.W))
+        {
+            transform.position += transform.TransformDirection(Vector3.forward) * Time.deltaTime * realSpeed;
+        }
+        else if (Input.GetKey(KeyCode.S))
+        {
+            transform.position -= transform.TransformDirection(Vector3.forward) * Time.deltaTime * realSpeed;
+        }
+    }
+
 }
