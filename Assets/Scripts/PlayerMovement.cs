@@ -11,6 +11,13 @@ public class PlayerMovement : MonoBehaviour
     public float rotX;
     public float rotY;
     public float rotZ;
+    Rigidbody rb; // referans tipi değişken
+    public void Start()
+    {
+        realSpeed = moveSpeed;
+        rb = GetComponent<Rigidbody>();
+    }
+
     void Update()
     {
         WalkAndRun();
@@ -18,7 +25,8 @@ public class PlayerMovement : MonoBehaviour
         VerticalMovement();
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            GetComponent<Rigidbody>().AddForce(Vector3.up * 500);
+            rb.AddForce(Vector3.up * 500);
+
         }
         rotX -= Input.GetAxis("Mouse Y") * Time.deltaTime * rotationspeed;
         rotY += Input.GetAxis("Mouse X") * Time.deltaTime * rotationspeed;
@@ -32,7 +40,8 @@ public class PlayerMovement : MonoBehaviour
         }
 
         transform.rotation = Quaternion.Euler(0, rotY, 0);
-        GameObject.FindWithTag("MainCamera").transform.rotation = Quaternion.Euler(rotX, rotY, 0);
+        Camera.main.transform.rotation = Quaternion.Euler(rotX, rotY, 0);
+        Camera.main.transform.position = transform.position;
     }
 
     private void WalkAndRun()
