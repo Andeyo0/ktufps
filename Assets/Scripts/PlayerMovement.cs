@@ -11,18 +11,30 @@ public class PlayerMovement : MonoBehaviour
     public float rotX;
     public float rotY;
     public float rotZ;
+    public float horizontal;
+    public float vertical;
+
     Rigidbody rb; // referans tipi değişken
+    public GameObject bulletPrefab;
     public void Start()
     {
         realSpeed = moveSpeed;
         rb = GetComponent<Rigidbody>();
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
-
     void Update()
     {
         WalkAndRun();
-        HorizontalMovement();
-        VerticalMovement();
+        vertical = Input.GetAxis("Vertical");
+        horizontal = Input.GetAxis("Horizontal");
+        
+        Vector3 direction = new Vector3(horizontal, 0, vertical);
+
+        direction = transform.TransformDirection(direction);
+
+        rb.MovePosition(transform.position +  direction * Time.deltaTime * realSpeed);
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
             rb.AddForce(Vector3.up * 500);
@@ -42,6 +54,13 @@ public class PlayerMovement : MonoBehaviour
         transform.rotation = Quaternion.Euler(0, rotY, 0);
         Camera.main.transform.rotation = Quaternion.Euler(rotX, rotY, 0);
         Camera.main.transform.position = transform.position;
+
+        if(Input.GetMouseButtonDown(0))
+        {
+            GameObject bulletObject = Instantiate(bulletPrefab);
+            bulletObject.transform.position = Camera.main.transform.position + Camera.main.transform.forward;
+            bulletObject.transform.forward = Camera.main.transform.forward;
+        }
     }
 
     private void WalkAndRun()
@@ -56,28 +75,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void VerticalMovement()
-    {
-        if (Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D))
-        {
-            transform.position += transform.TransformDirection(Vector3.left) * Time.deltaTime * realSpeed;
-        }
-        else if (!Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D))
-        {
-            transform.position -= transform.TransformDirection(Vector3.left) * Time.deltaTime * realSpeed;
-        }
-    }
-
-    private void HorizontalMovement()
-    {
-        if (Input.GetKey(KeyCode.W))
-        {
-            transform.position += transform.TransformDirection(Vector3.forward) * Time.deltaTime * realSpeed;
-        }
-        else if (Input.GetKey(KeyCode.S))
-        {
-            transform.position -= transform.TransformDirection(Vector3.forward) * Time.deltaTime * realSpeed;
-        }
-    }
+    
 
 }
